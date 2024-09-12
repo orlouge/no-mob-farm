@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "nomobfarm",
+  "version": "${version}",
+  "name": "No mob Farms",
+  "description": "",
+  "authors": [
+    "orlouge"
+  ],
+  "contact": {
+    "homepage": "https://github.com/orlouge/no-mob-farms",
+    "sources": "https://github.com/orlouge/no-mob-farms"
+  },
+  "license": "MIT",
+  "icon": "assets/nomobfarm/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.orlouge.nomobfarm.fabric.NoMobFarmFabric"
+    ],
+    "client": [
+      "io.github.orlouge.nomobfarm.fabric.client.NoMobFarmClient"
+    ]
+  },
+  "mixins": [
+    "nomobfarm.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.5",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  },
+  "suggests": {
+    "nootherfarms": "*"
+  }
+}
