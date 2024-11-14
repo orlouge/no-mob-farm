@@ -1,8 +1,9 @@
-package io.github.orlouge.nomobfarm.forge;
+package io.github.orlouge.nomobfarm.neoforge;
+
+import net.neoforged.fml.common.Mod;
 
 import io.github.orlouge.nomobfarm.NoMobFarmMod;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLPaths;
 
 @Mod(NoMobFarmMod.MOD_ID)
 public final class NoMobFarmForge {

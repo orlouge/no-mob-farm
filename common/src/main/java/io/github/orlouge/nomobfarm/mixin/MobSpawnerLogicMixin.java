@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Function;
 
-@Mixin(net.minecraft.world.MobSpawnerLogic.class)
+@Mixin(net.minecraft.block.spawner.MobSpawnerLogic.class)
 public class MobSpawnerLogicMixin implements TrackedMobOrigin, BasicMobDeathScoreAlgorithm.BasicMobDeathScoreAlgorithmNotify {
     private Box detectionBox = null;
     protected MobDeathScoreAlgorithm deathScore = new BasicMobDeathScoreAlgorithm(slowdownFunction(NoMobFarmMod.SPAWNER_SLOWDOWN_NEAR_RATE,

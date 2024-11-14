@@ -11,4 +11,4 @@ rootProject.name = 'nomobfarm'
 
 include 'common'
 include 'fabric'
-include 'forge'
+include 'neoforge'

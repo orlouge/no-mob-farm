@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class RaiderEntityMixin {
     private boolean wasRaider = false;
 
+    /*
     @ModifyVariable(method = "onDeath(Lnet/minecraft/entity/damage/DamageSource;)V",
                     at = @At("STORE"),
                     ordinal = 0)
@@ -25,6 +26,8 @@ public abstract class RaiderEntityMixin {
             return stack;
         }
     }
+
+     */
 
     @Inject(method = "setRaid(Lnet/minecraft/village/raid/Raid;)V",
             at = @At("HEAD"))

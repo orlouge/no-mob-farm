@@ -1,10 +1,13 @@
 package io.github.orlouge.nomobfarm.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import io.github.orlouge.nomobfarm.NoMobFarmMod;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,20 +24,27 @@ public abstract class ZombieEntityMixin extends HostileEntity {
 
     @ModifyArg(
             method = "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;<init>(Ljava/lang/String;DLnet/minecraft/entity/attribute/EntityAttributeModifier$Operation;)V"),
-            index = 1,
-            expect = 2
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;<init>(Lnet/minecraft/util/Identifier;DLnet/minecraft/entity/attribute/EntityAttributeModifier$Operation;)V"),
+            index = 1
     )
-    public double modifyReinforcementCharge(double charge) {
+    public double modifyCallerReinforcementCharge(double charge) {
         return charge - NoMobFarmMod.REINFORCEMENT_PENALTY;
     }
 
-    @Inject(
-            method = "convertTo(Lnet/minecraft/entity/EntityType;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/ZombieEntity;applyAttributeModifiers(F)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD
+    @ModifyArg(
+        method = "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/attribute/EntityAttributeInstance;addPersistentModifier(Lnet/minecraft/entity/attribute/EntityAttributeModifier;)V", ordinal = 1)
     )
-    public void applyPenaltyAfterConversion(EntityType<? extends ZombieEntity> entityType, CallbackInfo ci, ZombieEntity convertedZombie) {
+
+    public EntityAttributeModifier modifyCalleeReinforcementCharge(EntityAttributeModifier modifier) {
+        return new EntityAttributeModifier(Identifier.ofVanilla("reinforcement_callee_charge"), -0.05 - NoMobFarmMod.REINFORCEMENT_PENALTY, EntityAttributeModifier.Operation.ADD_VALUE);
+    }
+
+    @Inject(
+        method = "convertTo(Lnet/minecraft/entity/EntityType;)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/ZombieEntity;applyAttributeModifiers(F)V")
+    )
+    public void applyPenaltyAfterConversion(EntityType<? extends ZombieEntity> entityType, CallbackInfo ci, @Local(ordinal = 1) ZombieEntity convertedZombie) {
         if (NoMobFarmMod.REINFORCEMENT_PENALTY_CONVERSION) {
             convertedZombie.getAttributeInstance(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS).setFrom(
                     this.getAttributeInstance(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS)

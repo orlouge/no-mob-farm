@@ -1,38 +1,35 @@
 package io.github.orlouge.nomobfarm.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import io.github.orlouge.nomobfarm.NoMobFarmMod;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.raid.Raid;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.poi.PointOfInterest;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Iterator;
 import java.util.List;
 
 @Mixin(net.minecraft.village.raid.RaidManager.class)
 public class RaidManagerMixin {
-    @Inject(method = "startRaid(Lnet/minecraft/server/network/ServerPlayerEntity;)Lnet/minecraft/village/raid/Raid;",
-            at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"),
-            locals = LocalCapture.CAPTURE_FAILHARD,
-            cancellable = true)
-    public void checkPOIExtent(ServerPlayerEntity player, CallbackInfoReturnable<Raid> cir, DimensionType dt, BlockPos blockPos, List<PointOfInterest> poiList, int i, Vec3d vec3d) {
-        Iterator iter = poiList.iterator();
+    @Inject(method = "startRaid",
+        at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"),
+        cancellable = true)
+    public void checkPOIExtent(ServerPlayerEntity player, BlockPos pos, CallbackInfoReturnable<Raid> cir, @Local List<PointOfInterest> poiList) {
+        Iterator<PointOfInterest> iter = poiList.iterator();
 
         if (iter.hasNext()) {
-            BlockPos firstPoi = ((PointOfInterest) iter.next()).getPos();
+            BlockPos firstPoi = iter.next().getPos();
             int ax = firstPoi.getX(), az = firstPoi.getZ(), bx = ax, bz = az;
 
             while (iter.hasNext()) {
-                BlockPos poi = ((PointOfInterest) iter.next()).getPos();
+                BlockPos poi = iter.next().getPos();
 
                 ax = Integer.min(ax, poi.getX());
                 az = Integer.min(az, poi.getZ());
@@ -49,7 +46,7 @@ public class RaidManagerMixin {
         cir.cancel();
     }
 
-    @ModifyArg(method = "startRaid(Lnet/minecraft/server/network/ServerPlayerEntity;)Lnet/minecraft/village/raid/Raid;",
+    @ModifyArg(method = "startRaid",
                at = @At(value = "INVOKE", target = "Lnet/minecraft/village/raid/RaidManager;getOrCreateRaid(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/village/raid/Raid;"),
                index = 1)
     public BlockPos modifyRaidCenter(ServerWorld world, BlockPos pos) {
